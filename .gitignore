@@ -3,7 +3,6 @@
 *.pkg.zst
 src/
 pkg/
-.SRCINFO
 
 # Editor
 *~

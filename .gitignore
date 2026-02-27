@@ -1,0 +1,10 @@
+# Arch package build
+*.pkg.tar*
+*.pkg.zst
+src/
+pkg/
+.SRCINFO
+
+# Editor
+*~
+.*.sw?

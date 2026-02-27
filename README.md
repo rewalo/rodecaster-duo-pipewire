@@ -128,23 +128,3 @@ Loaded automatically at login.
 ## License
 
 MIT
-
----
-
-## Publishing to the AUR
-
-1. Create a GitHub repo and push this project.
-2. Create a new AUR package (e.g. `rodecaster-duo-pipewire`) and clone the AUR repo:
-   ```bash
-   git clone ssh://aur@aur.archlinux.org/rodecaster-duo-pipewire.git
-   cd rodecaster-duo-pipewire
-   ```
-3. Copy `PKGBUILD` and the six source files into the AUR repo. For a release-based source, change `PKGBUILD` to use:
-   ```bash
-   source=("https://github.com/rewalo/rodecaster-duo-pipewire/archive/v$pkgver.tar.gz")
-   sha256sums=('...')  # run updpkgsums after uploading a release
-   ```
-   and in `package()` use `cd "$srcdir/rodecaster-duo-pipewire-$pkgver"` before the `install` commands.
-4. As a **non-root** user, run `makepkg --printsrcinfo > .SRCINFO`, then commit and push to AUR.
-
-Alternatively, users can install from this repo with `git clone ... && cd ... && makepkg -si` (as non-root).

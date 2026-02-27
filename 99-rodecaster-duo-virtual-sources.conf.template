@@ -1,6 +1,6 @@
-# Rodecaster Duo virtual input sources (Main Multitrack + Chat only)
+# Rodecaster Duo virtual input sources
 #
-# Two inputs, matching Windows:
+# Inputs:
 #   Main Multitrack → pro-input-1 (RODECaster Duo Pro 1)
 #   Chat            → pro-input-0 (RODECaster Duo Pro)
 #

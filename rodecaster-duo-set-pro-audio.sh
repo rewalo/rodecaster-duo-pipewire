@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Set Rodecaster Duo (and similar Rode Pro devices) to Pro Audio profile.
-# Auto-detects the ALSA card by name; no hardcoded device ID.
+# Auto-detects the ALSA card by name
 # Run once after connecting the Duo, or from post-install.
 
 set -e

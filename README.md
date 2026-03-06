@@ -38,7 +38,6 @@ If you install without the device plugged in (or it wasn’t detected), run once
 ```bash
 rodecaster-duo-set-pro-audio
 rodecaster-duo-pipewire-install
-systemctl --user restart pipewire pipewire-pulse
 ```
 
 Then choose **Game**, **System**, **Chat**, or **Music** as output, and **Main Multitrack** or **Chat** as input.
@@ -104,8 +103,13 @@ Names (Game, System, Chat, Music, Main Multitrack, Chat) are set in the config t
 
 - `~/.config/pipewire/pipewire.conf.d/99-rodecaster-duo-virtual-sinks.conf` (outputs)
 - `~/.config/pipewire/pipewire.conf.d/99-rodecaster-duo-virtual-sources.conf` (inputs)
+- `~/.config/rodecaster-duo-pipewire/state.conf` (saved default sink for uninstall)
 
 Loaded automatically at login.
+
+## Default sink
+
+On install, the installer saves your current default sink and sets **System** (`rcp_duo_system_in`) as the new default. This ensures volume controls (e.g. in Quickshell, panels) work, since some sinks (like IEC958/optical) don't support software volume. On uninstall, the previous default is restored.
 
 ---
 

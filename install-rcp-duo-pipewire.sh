@@ -20,6 +20,9 @@ TEMPLATE_SOURCES="$TEMPLATE_DIR/99-rodecaster-duo-virtual-sources.conf.template"
 CONF_D="$HOME/.config/pipewire/pipewire.conf.d"
 CONF_FILE="$CONF_D/99-rodecaster-duo-virtual-sinks.conf"
 CONF_FILE_SOURCES="$CONF_D/99-rodecaster-duo-virtual-sources.conf"
+RCP_DUO_STATE_DIR="$HOME/.config/rodecaster-duo-pipewire"
+RCP_DUO_STATE_FILE="$RCP_DUO_STATE_DIR/state.conf"
+SYSTEM_SINK="rcp_duo_system_in"
 
 if [ "$1" = "--discover-only" ] || [ "$1" = "-d" ]; then
   if [ -x "/usr/bin/rodecaster-duo-pipewire-discover" ]; then
@@ -146,6 +149,17 @@ if [ ! -f "$TEMPLATE" ]; then
   exit 1
 fi
 
+# Save current default sink for restore on uninstall (skip if already System)
+CURRENT_DEFAULT=""
+if command -v pactl &>/dev/null; then
+  CURRENT_DEFAULT=$(pactl get-default-sink 2>/dev/null || true)
+fi
+if [ -n "$CURRENT_DEFAULT" ] && [ "$CURRENT_DEFAULT" != "$SYSTEM_SINK" ]; then
+  mkdir -p "$RCP_DUO_STATE_DIR"
+  echo "previous_default_sink=$CURRENT_DEFAULT" > "$RCP_DUO_STATE_FILE"
+  echo "Saved previous default sink for uninstall: $CURRENT_DEFAULT"
+fi
+
 mkdir -p "$CONF_D"
 sed -e "s|TARGET_OBJECT|$TARGET_OBJECT|g" -e "s|TARGET_CHAT_OBJECT|${TARGET_CHAT_OBJECT:-$TARGET_OBJECT}|g" "$TEMPLATE" > "$CONF_FILE"
 echo "Installed: $CONF_FILE"
@@ -158,7 +172,19 @@ else
 fi
 
 echo ""
-echo "Restart PipeWire: systemctl --user restart pipewire pipewire-pulse"
+echo "Restarting PipeWire..."
+systemctl --user restart pipewire pipewire-pulse wireplumber 2>/dev/null || true
+sleep 3
+
+# Set System (rcp_duo_system_in) as default sink for volume control compatibility
+if command -v pactl &>/dev/null; then
+  if pactl list short sinks 2>/dev/null | grep -q "$SYSTEM_SINK"; then
+    if pactl set-default-sink "$SYSTEM_SINK" 2>/dev/null; then
+      echo "Set default sink to System ($SYSTEM_SINK)."
+    fi
+  fi
+fi
+
 echo ""
 echo "Outputs: Game, System, Chat, Music."
 if [ -n "$TARGET_CAPTURE_MAIN" ] && [ -n "$TARGET_CAPTURE_CHAT" ]; then

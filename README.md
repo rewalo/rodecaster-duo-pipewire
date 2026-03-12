@@ -1,25 +1,23 @@
-# Rodecaster Duo - PipeWire virtual devices (Game, System, Chat, Music)
+# rodecaster-duo-pipewire
 
-PipeWire virtual sinks and sources for the **Rodecaster Duo**, matching the Windows layout:
+PipeWire virtual devices for the **Rodecaster Duo**, matching the Windows layout.
 
-- **Outputs:** Game, System, Chat, Music  
-  - Game, System, Music → Main Multitrack (pro-output-1, AUX0–AUX9)  
-  - Chat → separate Chat device (pro-output-0)
-- **Inputs:** Main Multitrack, Chat (pro-input-1, pro-input-0)
+**Main Multitrack** = RODECaster Duo Pro 1 (USB 1).
 
-The package **auto-detects** your Rodecaster Duo.
+- **Outputs:** Game, System, Chat, Music
+- **Inputs:** Main Multitrack (Pro 1), Chat (Pro 0)
+
+Connect the Duo, install, done
 
 ---
 
-## Install (Arch Linux / CachyOS)
-
-From the AUR (e.g. with [yay](https://github.com/Jguer/yay)):
+## Install (Arch / CachyOS)
 
 ```bash
 yay -S rodecaster-duo-pipewire
 ```
 
-Or build from this repo:
+Or from source:
 
 ```bash
 git clone https://github.com/rewalo/rodecaster-duo-pipewire.git
@@ -27,108 +25,79 @@ cd rodecaster-duo-pipewire
 makepkg -si
 ```
 
-**With your Rodecaster Duo connected**, the package will automatically set the Pro Audio profile, generate the PipeWire config, and restart PipeWire. You should see **Game**, **System**, **Chat**, and **Music** (outputs) and **Main Multitrack** / **Chat** (inputs) right after install.
+With the Duo connected, the installer sets Pro Audio, generates config, restarts PipeWire. You get Game / System / Chat / Music (outputs) and Main Multitrack / Chat (inputs).
 
----
-
-## If the Duo wasn’t connected during install
-
-If you install without the device plugged in (or it wasn’t detected), run once:
+**Duo not connected during install?** Run:
 
 ```bash
 rodecaster-duo-set-pro-audio
 rodecaster-duo-pipewire-install
 ```
 
-Then choose **Game**, **System**, **Chat**, or **Music** as output, and **Main Multitrack** or **Chat** as input.
+---
+
+## Commands
+
+| Command | Purpose |
+|--------|---------|
+| `rodecaster-duo-set-pro-audio` | Set Pro Audio profile |
+| `rodecaster-duo-pipewire-discover` | List detected Rode devices |
+| `rodecaster-duo-pipewire-install` | Regenerate config (auto-detects) |
+| `systemctl --user restart pipewire pipewire-pulse` | Apply config changes |
+
+**Important:** Run `rodecaster-duo-pipewire-install` without arguments. It finds the right devices automatically. Passing placeholder names like `TARGET_OBJECT` will break routing (everything ends up on Chat).
 
 ---
 
-## Commands (package install)
-
-| What | Command |
-|------|--------|
-| Set Pro Audio profile | `rodecaster-duo-set-pro-audio` |
-| List / discover devices | `rodecaster-duo-pipewire-discover` |
-| Install / regenerate config | `rodecaster-duo-pipewire-install` |
-| Apply config | `systemctl --user restart pipewire pipewire-pulse` |
-
----
-
-## Manual / script-only usage (no package)
-
-If you run the scripts from a git clone instead of installing the package:
+## Manual install (no package)
 
 ```bash
-# Set Pro Audio (replace with your card name from pactl list cards short)
 pactl set-card-profile alsa_card.usb-R__DE_RODECaster_Duo_XXXXX-00 pro-audio
-
-cd /path/to/rodecaster-duo-pipewire
 ./install-rcp-duo-pipewire.sh
 systemctl --user restart pipewire pipewire-pulse
 ```
 
-Discovery:
-
-```bash
-./install-rcp-duo-pipewire.sh   # auto-detects and installs
-# or
-./install-rcp-duo-pipewire.sh -d   # discover only
-./discover-rcp-devices.sh          # same
-```
+Replace the card name with yours (`pactl list cards short`).
 
 ---
 
-## Device renaming
+## Channel map
 
-Names (Game, System, Chat, Music, Main Multitrack, Chat) are set in the config templates as `node.description`. To rename devices:
-
-- Edit the generated configs in `~/.config/pipewire/pipewire.conf.d/` and change the `node.description = "..."` values, or  
-- Edit the templates in `/usr/share/rodecaster-duo-pipewire/` (when installed) and re-run `rodecaster-duo-pipewire-install`.
-
----
-
-## Channel map (outputs on Main Multitrack)
-
-| Output | AUX pair  |
-|--------|-----------|
-| System | AUX0 AUX1 |
-| Game   | AUX2 AUX3 |
-| Music  | AUX4 AUX5 |
-| Chat   | pro-output-0 (separate device) |
+| Output | Hardware |
+|--------|----------|
+| System | AUX0 AUX1 (Pro 1) |
+| Game | AUX2 AUX3 (Pro 1) |
+| Music | AUX4 AUX5 (Pro 1) |
+| Chat | pro-output-0 (separate) |
 
 ---
 
-## Where config is installed
+## Config files
 
-- `~/.config/pipewire/pipewire.conf.d/99-rodecaster-duo-virtual-sinks.conf` (outputs)
-- `~/.config/pipewire/pipewire.conf.d/99-rodecaster-duo-virtual-sources.conf` (inputs)
-- `~/.config/rodecaster-duo-pipewire/state.conf` (saved default sink for uninstall)
+- `~/.config/pipewire/pipewire.conf.d/99-rodecaster-duo-virtual-sinks.conf`
+- `~/.config/pipewire/pipewire.conf.d/99-rodecaster-duo-virtual-sources.conf`
+- `~/.config/rodecaster-duo-pipewire/state.conf` - saved default sink for uninstall
 
-Loaded automatically at login.
+Default sink is set to System so volume controls work.
 
-## Default sink
+---
 
-On install, the installer saves your current default sink and sets **System** (`rcp_duo_system_in`) as the new default. This ensures volume controls (e.g. in Quickshell, panels) work, since some sinks (like IEC958/optical) don't support software volume. On uninstall, the previous default is restored.
+## Renaming
+
+Edit `node.description` in the generated configs under `~/.config/pipewire/pipewire.conf.d/`, then restart PipeWire.
 
 ---
 
 ## Troubleshooting
 
-- **No multichannel Rode device found**  
-  Set the Duo to **Pro Audio** first: `rodecaster-duo-set-pro-audio`, then run `rodecaster-duo-pipewire-install` again.
+**No multichannel device found** - Set Pro Audio first: `rodecaster-duo-set-pro-audio`, then run `rodecaster-duo-pipewire-install` again.
 
-- **Chat output not working**  
-  Chat uses **pro-output-0**. The installer detects it as the Rode playback node with the fewest channels. Ensure the Duo is in Pro Audio and re-run `rodecaster-duo-pipewire-install`.
+**Chat not working** - Chat uses pro-output-0. Re-run install with the Duo in Pro Audio.
 
-- **Only stereo Rode in discovery**  
-  Set the Duo to **Pro Audio**, then run `rodecaster-duo-pipewire-discover` again.
+**All audio goes to Chat** - Config has placeholder names instead of real device names. Run `rodecaster-duo-pipewire-install` with no args (Duo connected, Pro Audio) to regenerate.
 
-- **Different card name**  
-  Run `pactl list cards short` and use your card name with `pactl set-card-profile <card-name> pro-audio`, or use `rodecaster-duo-set-pro-audio` which auto-detects Rode cards.
+**Different card name** - `pactl list cards short` to find it, then `pactl set-card-profile <card-name> pro-audio`.
 
 ---
-
-## License
 
 MIT

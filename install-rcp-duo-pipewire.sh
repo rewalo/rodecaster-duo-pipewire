@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 # Install PipeWire virtual devices for Rodecaster Duo.
-# Outputs: Game, System, Chat, Music (Chat uses pro-output-0; others use pro-output-1).
-# Inputs: Main Multitrack, Chat (pro-input-1, pro-input-0).
+# Main Multitrack = RODECASTER Duo Pro 1 (USB 1) : pro-output-1, pro-input-1.
+# Outputs: Game, System, Chat, Music. Inputs: Main Multitrack, Chat.
 #
-# Set Duo to "Pro Audio" profile first, then run this script.
-# Device names are set in the config templates; edit node.description to rename.
+# Set Duo to "Pro Audio" profile first. Run without args.
 
 set -e
+
+# Reject placeholder args (user must run without args for auto-discovery)
+for bad in TARGET_OBJECT TARGET_CHAT_OBJECT TARGET_CAPTURE_MAIN TARGET_CAPTURE_CHAT; do
+  if [ "$1" = "$bad" ]; then
+    echo "Don't pass placeholder names. Run without arguments : the script auto-detects your Rodecaster Duo."
+    echo "  rodecaster-duo-pipewire-install    # or: ./install-rcp-duo-pipewire.sh"
+    exit 1
+  fi
+done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # When installed via package, templates live in /usr/share
@@ -70,8 +78,14 @@ fi
     fi
     # Count AUX channels (AUX0..AUX9)
     aux_count=$(echo "$pos" | grep -o "AUX[0-9]" | sort -u | wc -l)
+    # Prefer pro-output-1 (Main Multitrack = RODECASTER Duo Pro 1) when channel counts tie
+    is_pro1=""
+    echo "$name" | grep -q "pro-output-1" && is_pro1=1
+    echo "$desc" | grep -qi "pro 1" && is_pro1=1
     if [ "${aux_count:-0}" -gt "$best_aux_count" ]; then
       best_aux_count=$aux_count
+      TARGET_OBJECT="$name"
+    elif [ "${aux_count:-0}" -eq "${best_aux_count:-0}" ] && [ -n "$is_pro1" ]; then
       TARGET_OBJECT="$name"
     fi
   done < <(pw-cli ls Node 2>/dev/null | grep -E "^\s*id [0-9]+")

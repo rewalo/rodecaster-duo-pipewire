@@ -1,10 +1,10 @@
 # Rodecaster Duo virtual stereo sinks (Game, System, Chat, Music)
 #
-# Outputs:
-#   Game, System, Music → pro-output-1 (Main Multitrack, AUX0–AUX9)
-#   Chat               → pro-output-0 (RODECaster Duo Pro / Chat device)
+# Main Multitrack = RODECASTER Duo Pro 1 (USB 1)
+#   Game, System, Music -> pro-output-1 (Main Multitrack / Pro 1, AUX0–AUX9)
+#   Chat               -> pro-output-0 (RODECaster Duo Pro / Chat device)
 #
-# Placeholders: TARGET_OBJECT = pro-output-1, TARGET_CHAT_OBJECT = pro-output-0
+# Placeholders (replaced at install): TARGET_OBJECT, TARGET_CHAT_OBJECT
 
 context.modules = [
   { name = libpipewire-module-loopback

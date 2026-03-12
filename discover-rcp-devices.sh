@@ -95,9 +95,9 @@ if [ -z "$MULTICHANNEL_FOUND" ]; then
   echo ">>> No multichannel Rode device found. To get System/Game/Music/Chat virtual sinks:"
   echo "    1. Switch RODECaster Duo to 'Pro Audio' profile:"
   echo "       rodecaster-duo-set-pro-audio   # if installed via package"
-  echo "       (or in Plasma: Settings → Audio → select the Duo → Profile: Pro Audio)"
+  echo "       (or in Plasma: Settings -> Audio -> select the Duo -> Profile: Pro Audio)"
   echo "    2. Run this script again to see the multichannel node (pro-output)."
   echo ""
 fi
 
-echo "Channel map (multichannel device): AUX0/1=System(Main), AUX2/3=Game, AUX4/5=Music, AUX6/7=Chat."
+echo "Channel map: AUX0/1=System, AUX2/3=Game, AUX4/5=Music (Pro 1). Chat = pro-output-0 (separate)."

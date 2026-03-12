@@ -1,10 +1,10 @@
 # Rodecaster Duo virtual input sources
 #
-# Inputs:
-#   Main Multitrack → pro-input-1 (RODECaster Duo Pro 1)
-#   Chat            → pro-input-0 (RODECaster Duo Pro)
+# Main Multitrack = RODECASTER Duo Pro 1 (USB 1)
+#   Main Multitrack -> pro-input-1 (Pro 1)
+#   Chat           -> pro-input-0 (RODECaster Duo Pro)
 #
-# Placeholders: TARGET_CAPTURE_MAIN, TARGET_CAPTURE_CHAT
+# Placeholders (replaced at install): TARGET_CAPTURE_MAIN, TARGET_CAPTURE_CHAT
 
 context.modules = [
   { name = libpipewire-module-loopback
